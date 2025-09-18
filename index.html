@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Draft Pick Application</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div id="app">
+        <h1>Draft Pick Application</h1>
+        <div id="setup-phase">
+            <h2>Setup Phase</h2>
+            <form id="team-form">
+                <input type="text" id="team-name" placeholder="Team Name" required>
+                <button type="submit">Add Team</button>
+            </form>
+            <ul id="team-list"></ul>
+            <form id="participant-form">
+                <input type="text" id="participant-name" placeholder="Participant Name" required>
+                <button type="submit">Add Participant</button>
+            </form>
+            <ul id="participant-list"></ul>
+            <button id="start-draft">Start Draft</button>
+        </div>
+        <div id="draft-phase" style="display:none;">
+            <h2>Draft Phase</h2>
+            <div id="draft-board"></div>
+            <button id="next-pick">Next Pick</button>
+        </div>
+        <div id="results-phase" style="display:none;">
+            <h2>Results Phase</h2>
+            <div id="final-rosters"></div>
+            <button id="restart-draft">Restart Draft</button>
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html>
