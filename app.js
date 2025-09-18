@@ -225,6 +225,10 @@ document.addEventListener('DOMContentLoaded', () => {
         draftInProgress = false;
         draftPhase.style.display = 'none';
         resultsPhase.style.display = '';
+        if (draftTeams.length === 0) {
+            finalRosters.innerHTML = `<p>No teams available.</p>`;
+            return;
+        }
         finalRosters.innerHTML = `
             <h3>Final Team Rosters</h3>
             <ul>
@@ -232,6 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     `<li><strong>${team.name}:</strong> ${team.members.join(', ') || '(none)'}</li>`
                 ).join('')}
             </ul>
+            <p>Draft complete! Click "Restart Draft" to begin again.</p>
         `;
     }
 
@@ -255,6 +260,7 @@ document.addEventListener('DOMContentLoaded', () => {
         participantNameInput.value = '';
         renderTeams();
         renderParticipants();
+        finalRosters.innerHTML = `<p>Add teams and participants to start a new draft.</p>`;
     });
 
     // On page load, show setup phase only
