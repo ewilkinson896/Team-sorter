@@ -16,12 +16,20 @@
                 <input type="text" id="team-name" placeholder="Team Name" required>
                 <button type="submit">Add Team</button>
             </form>
-            <ul id="team-list"></ul>
             <form id="participant-form">
                 <input type="text" id="participant-name" placeholder="Participant Name" required>
                 <button type="submit">Add Participant</button>
             </form>
-            <ul id="participant-list"></ul>
+            <div id="lists-container">
+                <div class="list-section">
+                    <h3>Teams</h3>
+                    <ul id="team-list"></ul>
+                </div>
+                <div class="list-section">
+                    <h3>Participants</h3>
+                    <ul id="participant-list"></ul>
+                </div>
+            </div>
             <button id="start-draft">Start Draft</button>
         </div>
         <div id="draft-phase" style="display:none;">
