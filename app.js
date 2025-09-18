@@ -1,4 +1,4 @@
-// Step 1: Basic UI interactivity (no draft logic yet)
+// Step 3: Draft Initialization & State Management
 
 document.addEventListener('DOMContentLoaded', () => {
     // Team management
@@ -101,6 +101,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Phase elements
+    const setupPhase = document.getElementById('setup-phase');
+    const draftPhase = document.getElementById('draft-phase');
+    const resultsPhase = document.getElementById('results-phase');
+    const draftBoard = document.getElementById('draft-board');
+    const finalRosters = document.getElementById('final-rosters');
+
+    // Draft state
+    let draftTeams = [];
+    let draftParticipants = [];
+    let draftAssignments = [];
+    let draftRound = 0;
+    let draftTeamTurn = 0;
+    let draftInProgress = false;
+
     // Validation before starting draft
     const startDraftBtn = document.getElementById('start-draft');
     startDraftBtn.onclick = () => {
@@ -112,14 +127,77 @@ document.addEventListener('DOMContentLoaded', () => {
             alert('You need at least 2 participants to start the draft.');
             return;
         }
-        alert('Draft will start in next step!');
+        // Initialize draft state
+        draftTeams = teams.map(team => ({ name: team.name, members: [] }));
+        draftParticipants = participants.map(person => person.name);
+        draftAssignments = [];
+        draftRound = 1;
+        draftTeamTurn = 0;
+        draftInProgress = true;
+
+        // Hide setup, show draft
+        setupPhase.style.display = 'none';
+        draftPhase.style.display = '';
+        resultsPhase.style.display = 'none';
+
+        renderDraftBoard();
     };
 
-    // Phase buttons (placeholders)
+    function renderDraftBoard() {
+        draftBoard.innerHTML = `
+            <div>
+                <strong>Round:</strong> ${draftRound}
+                &nbsp; | &nbsp;
+                <strong>Team Turn:</strong> ${draftTeams[draftTeamTurn].name}
+            </div>
+            <div>
+                <strong>Remaining Participants:</strong>
+                <ul>
+                    ${draftParticipants.map(name => `<li>${name}</li>`).join('')}
+                </ul>
+            </div>
+            <div>
+                <strong>Current Assignments:</strong>
+                <ul>
+                    ${draftTeams.map(team =>
+                        `<li>${team.name}: ${team.members.join(', ') || '(none)'}</li>`
+                    ).join('')}
+                </ul>
+            </div>
+        `;
+    }
+
+    // Next Pick button (no assignment logic yet)
     document.getElementById('next-pick').addEventListener('click', () => {
-        alert('Next pick will be implemented in later steps!');
+        alert('Draft pick logic will be implemented in the next step!');
     });
+
+    // Restart draft
     document.getElementById('restart-draft').addEventListener('click', () => {
-        alert('Restart will be implemented in later steps!');
+        // Reset all state
+        teams = [];
+        participants = [];
+        draftTeams = [];
+        draftParticipants = [];
+        draftAssignments = [];
+        draftRound = 0;
+        draftTeamTurn = 0;
+        draftInProgress = false;
+
+        // Reset UI
+        setupPhase.style.display = '';
+        draftPhase.style.display = 'none';
+        resultsPhase.style.display = 'none';
+        teamNameInput.value = '';
+        participantNameInput.value = '';
+        renderTeams();
+        renderParticipants();
     });
+
+    // On page load, show setup phase only
+    setupPhase.style.display = '';
+    draftPhase.style.display = 'none';
+    resultsPhase.style.display = 'none';
+    renderTeams();
+    renderParticipants();
 });
