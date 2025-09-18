@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const name = teamNameInput.value.trim();
         if (name) {
-            teams.push(name);
+            teams.push({ name });
             renderTeams();
             teamNameInput.value = '';
         }
