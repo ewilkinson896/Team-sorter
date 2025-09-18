@@ -7,14 +7,28 @@ document.addEventListener('DOMContentLoaded', () => {
     const teamList = document.getElementById('team-list');
     let teams = [];
 
+    // Message area for feedback
+    const messageArea = document.getElementById('message-area');
+    function showMessage(msg, type = 'error') {
+        messageArea.innerHTML = `<div class="${type}-message">${msg}</div>`;
+        setTimeout(() => { messageArea.innerHTML = ''; }, 3000);
+    }
+
     teamForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const name = teamNameInput.value.trim();
-        if (name) {
-            teams.push({ name });
-            renderTeams();
-            teamNameInput.value = '';
+        if (!name) {
+            showMessage('Team name cannot be empty.', 'error');
+            return;
         }
+        if (teams.some(team => team.name.toLowerCase() === name.toLowerCase())) {
+            showMessage('Team name must be unique.', 'error');
+            return;
+        }
+        teams.push({ name });
+        renderTeams();
+        teamNameInput.value = '';
+        showMessage('Team added!', 'success');
     });
 
     function renderTeams() {
@@ -60,11 +74,18 @@ document.addEventListener('DOMContentLoaded', () => {
     participantForm.addEventListener('submit', (e) => {
         e.preventDefault();
         const name = participantNameInput.value.trim();
-        if (name) {
-            participants.push({ name });
-            renderParticipants();
-            participantNameInput.value = '';
+        if (!name) {
+            showMessage('Participant name cannot be empty.', 'error');
+            return;
         }
+        if (participants.some(person => person.name.toLowerCase() === name.toLowerCase())) {
+            showMessage('Participant name must be unique.', 'error');
+            return;
+        }
+        participants.push({ name });
+        renderParticipants();
+        participantNameInput.value = '';
+        showMessage('Participant added!', 'success');
     });
 
     function renderParticipants() {
@@ -118,13 +139,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Validation before starting draft
     const startDraftBtn = document.getElementById('start-draft');
+    // Validation before starting draft
     startDraftBtn.onclick = () => {
         if (teams.length < 2) {
-            alert('You need at least 2 teams to start the draft.');
+            showMessage('You need at least 2 teams to start the draft.', 'error');
             return;
         }
         if (participants.length < 2) {
-            alert('You need at least 2 participants to start the draft.');
+            showMessage('You need at least 2 participants to start the draft.', 'error');
             return;
         }
         // Initialize draft state
