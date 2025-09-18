@@ -1,4 +1,4 @@
-// Step 3: Draft Initialization & State Management
+// Step 4: Automated Draft Process
 
 document.addEventListener('DOMContentLoaded', () => {
     // Team management
@@ -111,10 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Draft state
     let draftTeams = [];
     let draftParticipants = [];
-    let draftAssignments = [];
     let draftRound = 0;
     let draftTeamTurn = 0;
     let draftInProgress = false;
+    let teamPickLimits = [];
 
     // Validation before starting draft
     const startDraftBtn = document.getElementById('start-draft');
@@ -130,10 +130,12 @@ document.addEventListener('DOMContentLoaded', () => {
         // Initialize draft state
         draftTeams = teams.map(team => ({ name: team.name, members: [] }));
         draftParticipants = participants.map(person => person.name);
-        draftAssignments = [];
         draftRound = 1;
         draftTeamTurn = 0;
         draftInProgress = true;
+
+        // Calculate fair distribution
+        teamPickLimits = getTeamPickLimits(draftParticipants.length, draftTeams.length);
 
         // Hide setup, show draft
         setupPhase.style.display = 'none';
@@ -142,6 +144,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         renderDraftBoard();
     };
+
+    // Calculate fair distribution (e.g. 23 people, 5 teams = [5,5,5,4,4])
+    function getTeamPickLimits(numPeople, numTeams) {
+        const base = Math.floor(numPeople / numTeams);
+        const remainder = numPeople % numTeams;
+        const limits = Array(numTeams).fill(base);
+        for (let i = 0; i < remainder; i++) {
+            limits[i]++;
+        }
+        return limits;
+    }
 
     function renderDraftBoard() {
         draftBoard.innerHTML = `
@@ -159,18 +172,68 @@ document.addEventListener('DOMContentLoaded', () => {
             <div>
                 <strong>Current Assignments:</strong>
                 <ul>
-                    ${draftTeams.map(team =>
-                        `<li>${team.name}: ${team.members.join(', ') || '(none)'}</li>`
+                    ${draftTeams.map((team, idx) =>
+                        `<li>${team.name} (${team.members.length}/${teamPickLimits[idx]}): ${team.members.join(', ') || '(none)'}</li>`
                     ).join('')}
                 </ul>
             </div>
         `;
     }
 
-    // Next Pick button (no assignment logic yet)
+    // Next Pick button: assign one participant randomly to current team
     document.getElementById('next-pick').addEventListener('click', () => {
-        alert('Draft pick logic will be implemented in the next step!');
+        if (!draftInProgress) return;
+
+        // Check if draft is complete
+        if (draftParticipants.length === 0) {
+            showResults();
+            return;
+        }
+
+        // Check if current team has reached its pick limit
+        if (draftTeams[draftTeamTurn].members.length >= teamPickLimits[draftTeamTurn]) {
+            // Move to next team
+            draftTeamTurn = (draftTeamTurn + 1) % draftTeams.length;
+            // If all teams have reached their limit, draft is done
+            if (draftTeams.every((team, idx) => team.members.length >= teamPickLimits[idx])) {
+                showResults();
+                return;
+            }
+            renderDraftBoard();
+            return;
+        }
+
+        // Randomly select a participant
+        const randIdx = Math.floor(Math.random() * draftParticipants.length);
+        const picked = draftParticipants.splice(randIdx, 1)[0];
+        draftTeams[draftTeamTurn].members.push(picked);
+
+        // Move to next team for next pick
+        draftTeamTurn = (draftTeamTurn + 1) % draftTeams.length;
+        // If we've looped through all teams, increment round
+        if (draftTeamTurn === 0) draftRound++;
+
+        renderDraftBoard();
+
+        // If all participants assigned, show results
+        if (draftParticipants.length === 0) {
+            showResults();
+        }
     });
+
+    function showResults() {
+        draftInProgress = false;
+        draftPhase.style.display = 'none';
+        resultsPhase.style.display = '';
+        finalRosters.innerHTML = `
+            <h3>Final Team Rosters</h3>
+            <ul>
+                ${draftTeams.map(team =>
+                    `<li><strong>${team.name}:</strong> ${team.members.join(', ') || '(none)'}</li>`
+                ).join('')}
+            </ul>
+        `;
+    }
 
     // Restart draft
     document.getElementById('restart-draft').addEventListener('click', () => {
@@ -179,10 +242,10 @@ document.addEventListener('DOMContentLoaded', () => {
         participants = [];
         draftTeams = [];
         draftParticipants = [];
-        draftAssignments = [];
         draftRound = 0;
         draftTeamTurn = 0;
         draftInProgress = false;
+        teamPickLimits = [];
 
         // Reset UI
         setupPhase.style.display = '';
